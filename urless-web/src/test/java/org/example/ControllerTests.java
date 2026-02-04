@@ -16,6 +16,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -43,8 +44,8 @@ public class ControllerTests {
 
     @Test
     void test301OnExisting() throws Exception {
-        urlGateway.create("https://example.com", "qwerty2");
-        mockMvc.perform(get("/qwerty2"))
+        urlGateway.create("https://example.com", "qwery2");
+        mockMvc.perform(get("/qwery2"))
                 .andExpect(status().isMovedPermanently())
                 .andExpect(header().string("Location", "https://example.com"));
     }
@@ -77,6 +78,25 @@ public class ControllerTests {
 
         var expected = urlCollectionGateway.getAll().get(0);
         assertEquals("https://urle.ss/" + expected.getId(), response.getUrl());
+    }
+
+    @Test
+    void test200OnExistingCollection() throws Exception {
+        urlGateway.create("https://example.com/42", "xcvbn2");
+        urlGateway.create("https://example.com/420", "xc5bn2");
+        var ids = Arrays.asList("xcvbn2", "xc5bn2");
+        urlCollectionGateway.create(ids, "qwty2");
+
+        var om = new ObjectMapper();
+        var r = mockMvc.perform(get("/qwty2"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        var response = om.readValue(r, CreateURLCollectionResponse.class);
+        var expected = urlCollectionGateway.getAll().get(0);
+        var expectedUrls = expected.getUrls().stream().map(u -> "https://urle.ss/" + u.getId()).toList();
+
+        assertEquals("https://urle.ss/" + expected.getId(), response.getUrl());
+        assertTrue(response.getUrls().containsAll(expectedUrls));
     }
 }
 

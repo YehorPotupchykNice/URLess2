@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shortener.ShortenedURL;
+import shortener.ShortenedURLCollection;
 import usecases.CollectionShortenerUseCase;
 import usecases.ShortenerUseCase;
 
@@ -27,8 +28,16 @@ public class ShortenerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable String id) {
-        return shortener.getById(id)
-                .map(getResponse()).orElse(notFound());
+        if (id.length() == 6) {
+            return shortener.getById(id)
+                    .map(getResponse()).orElse(notFound());
+        }
+
+        if (id.length() == 5) {
+            return collectionShortener.getById(id).map(getCollectionResponse()).orElse(notFound());
+        }
+
+        return notFound();
     }
 
     private static @NonNull ResponseEntity<Object> notFound() {
@@ -40,6 +49,13 @@ public class ShortenerController {
                 .status(HttpStatus.MOVED_PERMANENTLY)
                 .header("Location", s.getUrl())
                 .build();
+    }
+
+    private static @NonNull Function<ShortenedURLCollection, ResponseEntity<Object>> getCollectionResponse() {
+        return s -> ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new CreateURLCollectionResponse("https://urle.ss/" + s.getId(),
+                        s.getUrls().stream().map(u -> "https://urle.ss/" + u.getId()).toList()));
     }
 
     @PostMapping
