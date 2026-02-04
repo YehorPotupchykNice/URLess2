@@ -1,5 +1,6 @@
-package interactors;
+package interactors.interactors;
 
+import interactors.ShortenerInteractor;
 import interactors.fake.IdGeneratorFake;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
