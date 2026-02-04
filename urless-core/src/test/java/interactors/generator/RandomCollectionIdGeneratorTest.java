@@ -4,18 +4,24 @@ import generator.RandomCollectionIdGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.regex.Pattern;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomCollectionIdGeneratorTest {
     @Test
     public void testMinimalRandomness()
     {
+        var pattern = Pattern.compile("^[a-zA-Z0-9-=_]{5}$").pattern();
         var generator = new RandomCollectionIdGenerator();
+
         var ids = new HashSet<String>();
         for (int i = 0; i < 100; i++) {
             ids.add(generator.generate());
         }
+        ;
         assertEquals(100,ids.size());
+        assertTrue(ids.stream().allMatch(id -> id.matches(pattern)));
 
     }
 }
