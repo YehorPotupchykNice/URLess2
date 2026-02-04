@@ -1,5 +1,6 @@
 package interactors.interactors;
 
+import interactors.CollectionShortenerInteractor;
 import interactors.ShortenerInteractor;
 import interactors.fake.IdGeneratorFake;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,6 +17,7 @@ public class ShortenerInteractorTest {
     static URLGateway urlGateway;
     static ShortenerInteractor shortenerInteractor;
     static IdGeneratorFake idGenerator;
+    static CollectionShortenerInteractor interactor;
 
     @BeforeAll
     static void setup() {
