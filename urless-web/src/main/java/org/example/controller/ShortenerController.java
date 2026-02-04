@@ -1,5 +1,7 @@
 package org.example.controller;
 
+import org.example.dto.CreateURLCollectionRequest;
+import org.example.dto.CreateURLCollectionResponse;
 import org.example.dto.CreateURLRequest;
 import org.example.dto.CreateURLResponse;
 import org.jspecify.annotations.NonNull;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shortener.ShortenedURL;
+import usecases.CollectionShortenerUseCase;
 import usecases.ShortenerUseCase;
 
 import java.net.URI;
@@ -18,6 +21,9 @@ public class ShortenerController {
 
     @Autowired
     private ShortenerUseCase shortener;
+
+    @Autowired
+    private CollectionShortenerUseCase collectionShortener;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable String id) {
@@ -40,6 +46,14 @@ public class ShortenerController {
     public ResponseEntity<?> post(@RequestBody CreateURLRequest request) {
         var r = shortener.create(request.getUrl());
         var url = "https://urle.ss/" + r.getId();
-        return ResponseEntity.created(URI.create(url)).body(new CreateURLResponse(url, request.getUrl()));
+        return ResponseEntity.created(URI.create(url)).body(new CreateURLResponse(url, r.getUrl()));
+    }
+
+    @PostMapping("/collections")
+    public ResponseEntity<?> postCollections(@RequestBody CreateURLCollectionRequest request) {
+        var r = collectionShortener.create(request.getUrls());
+        var url = "https://urle.ss/" + r.getId();
+        return ResponseEntity.created(URI.create(url))
+                .body(new CreateURLCollectionResponse(url, r.getUrls().stream().map(ShortenedURL::getId).toList()));
     }
 }

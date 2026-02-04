@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.dto.CreateURLCollectionRequest;
+import org.example.dto.CreateURLCollectionResponse;
 import org.example.dto.CreateURLRequest;
 import org.example.dto.CreateURLResponse;
 import org.junit.jupiter.api.Test;
@@ -8,8 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import shortener.URLCollectionGateway;
 import shortener.URLGateway;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,6 +31,8 @@ public class ControllerTests {
     private MockMvc mockMvc;
     @Autowired
     private URLGateway urlGateway;
+    @Autowired
+    private URLCollectionGateway urlCollectionGateway;
 
     @Test
     void test404OnNonexistent() throws Exception {
@@ -54,6 +61,21 @@ public class ControllerTests {
 
         var expected = urlGateway.getAll().get(0);
         assertEquals(expected.getUrl(), response.getOriginalUrl());
+        assertEquals("https://urle.ss/" + expected.getId(), response.getUrl());
+    }
+
+    @Test
+    void test201OnCreateCollection() throws Exception {
+        var urls = Arrays.asList("https://example.com/1", "https://example.com/2");
+        var request = new CreateURLCollectionRequest(urls);
+        var om = new ObjectMapper();
+        var json = om.writeValueAsString(request);
+
+        var r = mockMvc.perform(post("/collections").contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        var response = om.readValue(r, CreateURLCollectionResponse.class);
+
+        var expected = urlCollectionGateway.getAll().get(0);
         assertEquals("https://urle.ss/" + expected.getId(), response.getUrl());
     }
 }

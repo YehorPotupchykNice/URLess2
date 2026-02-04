@@ -1,15 +1,16 @@
 package shortener;
 
 import interactors.ShortenerInteractor;
+import usecases.ShortenerUseCase;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class MockURLCollectionGateway implements URLCollectionGateway {
     private final HashMap<String, ShortenedURLCollection> collections = new HashMap<>();
-    private final ShortenerInteractor urlShortener;
+    private final ShortenerUseCase urlShortener;
 
-    public MockURLCollectionGateway(ShortenerInteractor urlShortener) {
+    public MockURLCollectionGateway(ShortenerUseCase urlShortener) {
         this.urlShortener = urlShortener;
     }
 
@@ -28,6 +29,6 @@ public class MockURLCollectionGateway implements URLCollectionGateway {
 
     @Override
     public List<ShortenedURLCollection> getAll() {
-        return List.of();
+        return collections.values().stream().toList();
     }
 }
