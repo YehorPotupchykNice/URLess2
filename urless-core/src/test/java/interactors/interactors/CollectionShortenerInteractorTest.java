@@ -3,6 +3,7 @@ package interactors.interactors;
 import generator.SHA1Generator;
 import interactors.CollectionShortenerInteractor;
 import interactors.ShortenerInteractor;
+import interactors.fake.CollectionIdGeneratorFake;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import shortener.MockURLCollectionGateway;
@@ -23,7 +24,7 @@ public class CollectionShortenerInteractorTest {
     public void setup() {
         var shortenerInteractor = new ShortenerInteractor(new MockURLGateway(), new SHA1Generator());
         urlCollectionGateway = new MockURLCollectionGateway(shortenerInteractor);
-        interactor = new CollectionShortenerInteractor(urlCollectionGateway);
+        interactor = new CollectionShortenerInteractor(urlCollectionGateway, new CollectionIdGeneratorFake());
     }
 
     @Test
@@ -42,6 +43,17 @@ public class CollectionShortenerInteractorTest {
 
         assertNotNull(actual);
         assertEquals("asdfg", actual.getId());
+        assertTrue(actual.getUrls().stream().map(ShortenedURL::getUrl).toList().containsAll(urls));
+    }
+
+    @Test
+    public void createAndReturnCollection() {
+        var urls = Arrays.asList("https://example.com/1", "https://example.com/2");
+
+        var actual = interactor.create(urls);
+
+        assertNotNull(actual);
+        assertEquals("42", actual.getId());
         assertTrue(actual.getUrls().stream().map(ShortenedURL::getUrl).toList().containsAll(urls));
     }
 }

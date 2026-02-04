@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface CollectionShortenerUseCase {
     Optional<ShortenedURLCollection> getById(String id);
 
-    ShortenedURLCollection create(List<String> url);
+    ShortenedURLCollection create(List<String> urls);
 }

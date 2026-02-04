@@ -1,5 +1,6 @@
 package interactors;
 
+import generator.CollectionIdGenerator;
 import shortener.ShortenedURLCollection;
 import shortener.URLCollectionGateway;
 import usecases.CollectionShortenerUseCase;
@@ -10,9 +11,11 @@ import java.util.Optional;
 public class CollectionShortenerInteractor implements CollectionShortenerUseCase {
 
     private final URLCollectionGateway  urlCollectionGateway;
+    private final CollectionIdGenerator idGenerator;
 
-    public CollectionShortenerInteractor(URLCollectionGateway urlCollectionGateway) {
+    public CollectionShortenerInteractor(URLCollectionGateway urlCollectionGateway, CollectionIdGenerator idGenerator) {
         this.urlCollectionGateway = urlCollectionGateway;
+        this.idGenerator = idGenerator;
     }
 
     @Override
@@ -21,7 +24,7 @@ public class CollectionShortenerInteractor implements CollectionShortenerUseCase
     }
 
     @Override
-    public ShortenedURLCollection create(List<String> url) {
-        return null;
+    public ShortenedURLCollection create(List<String> urls) {
+        return urlCollectionGateway.create(urls, idGenerator.generate());
     }
 }
